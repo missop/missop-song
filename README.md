@@ -173,6 +173,50 @@ config.reslove={
 * params:QueryString params(最后一个是参数)
   * 有一部分是可以提取的不变的参数
   * 另外一部分是可变参数
+* 有些接口是需要验证referer和host的，只有它们一致的时候才能成功获取数据
+  * 利用代理伪装成qq服务器去请求接口(利用webpack中的express创建的服务器创建一个接口，前端再去请求,把header设置为qq)
+  * 前端不再使用jsonp请求而改用axios，不需要跨域
+  * 后端接口如果增加一个签名即可限制我们对他们接口的请求
+```
+apiRoutes.get('/getDiscList', function (req, res) {
+  var url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
+  axios.get(url, {
+    headers: {
+      referer: 'https://c.y.qq.com/',
+      host: 'c.y.qq.com'
+    },
+    params: req.query
+  }).then((response) => {
+    res.json(response.data)
+  }).catch((e) => {
+    console.log(e)
+  })
+})
+```
+1.5 hasClass和addClass的封装
+* hasClass 用正则表达式
+* addClass split(' ').push().join(' ')
+1.6 轮播图的宽度没有设置上去
+* 原因分析：测试发现slider中的mounted比recommend获取到数据先执行，因此打印出来的slider只有2个元素
+* 只要在wrapper上面加上一个v-if判断就可以了(注意是recommends.length)
+`<div v-if="recommends.length" class="slider-wrapper">`
+1.7 轮播图组件（通用base文件夹内）
+* 初始化轮播图
+* 轮播图scrollEnd事件设置当前的轮播图索引值
+* 轮播图自动播放设置(计算索引值然后执行goToPage())
+* 轮播拖动后图片会瞬间变化（此时应该清除定时器重新设置）
+* 改变设备后图片宽度不正常（resize时重新计算width）
+* 优化方案
+  * keep-alive包裹router-view能有效进行缓存不会每次切换路由都重新请求接口:
+  `<keep-alive>
+           <router-view></router-view>
+         </keep-alive>`
+  * 在组件销毁时清除定时器
+  ` destroy() {
+           clearTimeout(this.timer)
+         }`
+
+         
 
 
 
