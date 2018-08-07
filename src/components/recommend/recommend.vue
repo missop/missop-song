@@ -1,26 +1,28 @@
 <template>
   <div class="recommend">
-    <scroll class="recommend-content" :data="discList">
-      <div v-if="recommends.length" class="slider-wrapper">
-        <slider>
-          <a v-for="item in recommends" :href="item.linkUrl">
-            <img :src="item.picUrl" alt="">
-          </a>
-        </slider>
-      </div>
-      <div class="recommend-list">
-        <h1 class="list-title">热门歌单推荐</h1>
-        <ul>
-          <li v-for="item in discList" class="item">
-            <div class="icon">
-              <img :src="item.imgurl" alt="" width="60" height="60">
-            </div>
-            <div class="text">
-              <h2 class="name" v-html="item.creator.name"></h2>
-              <p class="desc" v-html="item.dissname"></p>
-            </div>
-          </li>
-        </ul>
+    <scroll ref="scroll" class="recommend-content" :data="discList">
+      <div>
+        <div v-if="recommends.length" class="slider-wrapper">
+          <slider>
+            <a v-for="item in recommends" :href="item.linkUrl">
+              <img @load="imgLoaded" :src="item.picUrl" alt="">
+            </a>
+          </slider>
+        </div>
+        <div class="recommend-list">
+          <h1 class="list-title">热门歌单推荐</h1>
+          <ul>
+            <li v-for="item in discList" class="item">
+              <div class="icon">
+                <img :src="item.imgurl" alt="" width="60" height="60">
+              </div>
+              <div class="text">
+                <h2 class="name" v-html="item.creator.name"></h2>
+                <p class="desc" v-html="item.dissname"></p>
+              </div>
+            </li>
+          </ul>
+        </div>
       </div>
     </scroll>
   </div>
@@ -59,6 +61,12 @@
             this.discList = res.data.list
           }
         })
+      },
+      imgLoaded() {
+        if (!this.loaded) {
+          this.$refs.scroll.refresh()
+          this.loaded = true
+        }
       }
     },
     components: {

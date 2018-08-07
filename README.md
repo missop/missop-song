@@ -215,6 +215,8 @@ apiRoutes.get('/getDiscList', function (req, res) {
   ` destroy() {
            clearTimeout(this.timer)
          }`
+1.8 scroll组件
+
 
          
 

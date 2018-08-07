@@ -36,27 +36,27 @@
           probeType: this.probeType,
           click: this.click
         })
+      },
+      disable() {
+        this.scroll && this.scroll.disable()
+      },
+      enable() {
+        this.scroll && this.scroll.enable()
+      },
+      refresh() {
+        this.scroll && this.scroll.refresh()
+      },
+      scrollTo() {
+        this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
+      },
+      scrollToElement() {
+        this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
       }
-    },
-    disable() {
-      this.scroll && this.scroll.disable()
-    },
-    enable() {
-      this.scroll && this.scroll.enable()
-    },
-    refresh() {
-      this.scroll && this.scroll.refresh()
-    },
-    scrollTo() {
-      this.scroll && this.scroll.scrollTo.apply(this.scroll, arguments)
-    },
-    scrollToElement() {
-      this.scroll && this.scroll.scrollToElement.apply(this.scroll, arguments)
     },
     watch: {
       data() {
         setTimeout(() => {
-          console.log(this.methods)
+          this.refresh()
         }, 20)
       }
     }
