@@ -216,6 +216,14 @@ apiRoutes.get('/getDiscList', function (req, res) {
            clearTimeout(this.timer)
          }`
 1.8 scroll组件
+* 主要结构：`<div><slot></slot></div>`
+  * 插槽内容在父组件recommend中写，方法在scroll中写
+  * better-scroll的初始化与更新
+    * scroll组件中mounted初始化，然而此时图片不一定加载完毕，data也不一定加载出来
+    * 图片加载完毕后更新(@load=fn)
+    * data变化后更新(watch)
+* 遇到的问题:(better-scroll的方法无法添加到组件上面)---原因是methods少了一个大括号
+
 
 
          
