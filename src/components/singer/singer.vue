@@ -1,11 +1,29 @@
 <template>
   <div class="singer">
-i an singer
+    i an singer
   </div>
 </template>
 
 <script>
- export default {}
+  import {getSingerList} from 'api/singer'
+  import {ERR_OK} from 'api/config'
+
+  export default {
+    mounted() {
+      setTimeout(() => {
+        this._getSingerList()
+      }, 20)
+    },
+    methods: {
+      _getSingerList() {
+        getSingerList().then((res) => {
+          if (res.code === ERR_OK) {
+            console.log(res.data)
+          }
+        })
+      }
+    }
+  }
 
 </script>
 
