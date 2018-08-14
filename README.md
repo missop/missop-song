@@ -228,6 +228,20 @@ apiRoutes.get('/getDiscList', function (req, res) {
 
 ### 第二节 歌手页
 2.1 歌手页面数据处理
+* 数据结构改造：从平行结构改造为我门需要的数组嵌套的结构
+  * [{},{},{}]=>[{a:{items:[]}}]
+  * 按照某一个字段来作为属性遍历
+```
+     let key = item.Findex
+     if (!result[key]) {
+       result[key] = {
+         title: key,
+         items: []
+       }
+     }
+```
+  * 把对象拆分为多个数组，然后再合并为一个数组
+    * 对象是无序的，要想按照一定的顺序渲染数据就必须自己将其转化为数组
 2.2 
 
 
