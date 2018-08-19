@@ -6,10 +6,14 @@
           :listenScroll="listenScroll"
           @scroll="scroll">
     <ul>
-      <li v-for="group in groupList" class="list-group" ref="listGroup">
+      <li
+        v-for="group in groupList"
+        class="list-group"
+        ref="listGroup">
         <h2 class="list-group-title">{{group.title}}</h2>
         <ul>
-          <li v-for="item in group.items" class="list-group-item">
+          <li v-for="item in group.items" class="list-group-item"
+              @click="showDetail(item)">
             <img class="avatar" v-lazy="item.avatar" alt="">
             <span class="name">{{item.name}}</span>
           </li>
@@ -26,20 +30,29 @@
         </li>
       </ul>
     </div>
+    <div class="list-fixed" ref="fixed" v-show="fixedTitle">
+      <div class="fixed-title">{{fixedTitle}}</div>
+    </div>
+    <div v-show="!groupList.length" class="loading-container">
+      <loading></loading>
+    </div>
   </scroll>
 </template>
 
 <script>
   import Scroll from 'base/scroll/scroll'
   import {data} from 'common/js/dom'
+  import Loading from 'base/loading/loading'
 
   const ANCHOR_HEIGHT = 18
+  const TITLE_HEIGHT = 30
 
   export default {
     data() {
       return {
         scrollY: -1,
-        currentIndex: 0
+        currentIndex: 0,
+        diff: -1
       }
     },
     props: {
@@ -53,6 +66,12 @@
         return this.groupList.map((item) => {
           return item.title.substr(0, 1)
         })
+      },
+      fixedTitle() {
+        if (this.scrollY > 0) {
+          return ''
+        }
+        return this.groupList[this.currentIndex] ? this.groupList[this.currentIndex].title : ''
       }
     },
     created() {
@@ -90,7 +109,21 @@
         }
       },
       _scrollTo(index) {
+        // index为null时直接退出
+        if (!index && index !== 0) {
+          return
+        }
+        // 划到上边界以外以及下边界
+        if (index < 0) {
+          index = 0
+        } else if (index > this.listHeight.length - 2) {
+          index = this.listHeight.length - 2
+        }
+        this.scrollY = -this.listHeight[index]
         this.$refs.listview.scrollToElement(this.$refs.listGroup[index], 0)
+      },
+      showDetail(group) {
+        this.$emit('select', group)
       }
     },
     watch: {
@@ -112,15 +145,25 @@
           let bottomHeight = listHeight[i + 1]
           if (-newY < bottomHeight && -newY >= topHeight) {
             this.currentIndex = i
+            this.diff = bottomHeight + newY
             return
           }
         }
         // 滚动到了底部
         this.currentIndex = listHeight.length - 2
+      },
+      diff(newDiff) {
+        let fixedTop = (newDiff > 0 && newDiff < TITLE_HEIGHT) ? newDiff - TITLE_HEIGHT : 0
+        if (this.fixedTop === fixedTop) {
+          return
+        }
+        this.fixedTop = fixedTop
+        this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
       }
     },
     components: {
-      Scroll
+      Scroll,
+      Loading
     }
   }
 </script>
