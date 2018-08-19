@@ -271,6 +271,21 @@ apiRoutes.get('/getDiscList', function (req, res) {
 * 创建一个event bus然后发射出去($emit),这样其他组件都可以使用
 * 如果有大量的数据、状态需要在多个组件中修改使用，那么只能使用vuex
 
+2.3 vuex的mutation-types
+* 这个文件是干什么用的========规定mutations的变量名========
+使用的时候改用自己需要的变量名(needName)来使用...mapMutations({needName:mutation-type})
+* getters=====返回state处理后的数据(相当于computed)
+
+2.4 music-list组件
+* 上方的歌手图片与标题，相对定位
+* 下方时歌曲列表，下方滚动时：
+  * 向下滚动时，歌手图片以顶部为中心点放大
+  * 向上滚动时，整个元素向上移动，直到顶部留下44的高度（一个标题高度），
+需要根据scrollY来设置图片高度以及层级
+    * 向上滚动逐渐高斯模糊，利用高度差计算模糊度
+* 提取SongList公共组件（多个页面会用到）
+
+
 
 
 
