@@ -38,6 +38,14 @@
         list.forEach(item => {
           let {musicData} = item
           if (musicData.songid && musicData.albumid) {
+            // getSongDetail(musicData.songmid).then(res => {
+            //   if (res.code === ERR_OK) {
+            //     const svkey = res.data.items
+            //     const songVkey = svkey[0].vkey
+            //     const newSong = createSong(musicData, songVkey)
+            //     ret.push(newSong)
+            //   }
+            // })
             ret.push(createSong(musicData))
           }
         })

@@ -253,7 +253,7 @@ apiRoutes.get('/getDiscList', function (req, res) {
     * 滑动到顶部以上时，固定标题隐藏，用v-show来执行
     
 ### 第三节 歌手详情页
-2.1 子路由配置以及路由参数、页面切换动画
+3.1 子路由配置以及路由参数、页面切换动画
 ```
 子路由可以直接加参数，然后上面的页面覆盖下面的页面,加上reansition就可以有动画了
 {
@@ -267,16 +267,16 @@ apiRoutes.get('/getDiscList', function (req, res) {
       ]
 }
 ```
-2.2 Global Event Bus(全局事件总线)
+3.2 Global Event Bus(全局事件总线)
 * 创建一个event bus然后发射出去($emit),这样其他组件都可以使用
 * 如果有大量的数据、状态需要在多个组件中修改使用，那么只能使用vuex
 
-2.3 vuex的mutation-types
+3.3 vuex的mutation-types
 * 这个文件是干什么用的========规定mutations的变量名========
 使用的时候改用自己需要的变量名(needName)来使用...mapMutations({needName:mutation-type})
 * getters=====返回state处理后的数据(相当于computed)
 
-2.4 music-list组件
+3.4 music-list组件
 * 上方的歌手图片与标题，相对定位
 * 下方时歌曲列表，下方滚动时：
   * 向下滚动时，歌手图片以顶部为中心点放大
@@ -284,6 +284,58 @@ apiRoutes.get('/getDiscList', function (req, res) {
 需要根据scrollY来设置图片高度以及层级
     * 向上滚动逐渐高斯模糊，利用高度差计算模糊度
 * 提取SongList公共组件（多个页面会用到）
+
+### 第四节 播放器组件
+4.1 state设置
+* 多个页面会用到的共同状态
+* 根据页面的状态需求设置变量（播放列表、顺序播放列表、播放模式（顺序、倒序、随机）、播放或暂停等等）
+* 根据state设置相应的getters、mutations，需要同时触发多个mutations的时候使用actions
+4.2 v-if和v-show能够触发动画
+4.3 动画钩子
+* 入场动画
+  * @before-enter----beforeEnter(el){}
+  * @enter-----------enter(el,done){ done() }必须使用done来结束
+  * @afterEnter------afterEnter(el){}
+* 出场动画
+ * @before-leave----beforeLeave(el){}
+ * @leave-----------leave(el,done){ done() }必须使用done来结束
+ * @afterLeave------afterLeave(el){}
+* 执行done的方法
+ * `this.$refs.cdWrapper.addEventListener('transitionend', done)`
+4.4 create-keyframe-animation插件用js创建keyframes动画
+* 注册动画:animations.registerAnimation({options})
+  * 选项说明
+  * name:'move'(对应keyframes的动画名)
+  * 具体动画参数(对应csskeyframes那一部分)
+  ```
+    {
+      0: {
+        transform: `translate3d(${x},${y},0) scale(${scale})`
+      },
+      60: {
+        transform: 'translate3d(0,0,0) scale(1.1)'
+      },
+      100: {
+        transform: 'translate3d(0,0,0) scale(1)'
+      }
+    }
+    ```
+  * `presets: { duration: 400, easing: 'linear'}`(对应animation中对动画的设置)
+* 执行动画:animations.runAnimation(this.$refs.cdWrapper, 'move', done)
+4.5 v-show和v-if
+* v-if 条件渲染:直到条件满足时才渲染（有一个watch的过程）
+* v-show 切换display
+* 两者比较：
+  * 整块组件建议使用v-if
+  * 暂时性隐藏则使用v-show
+4.* 错误集合
+* 从歌手页面进入歌曲播放页面报错：Cannot read property 'play' of undefined"
+在nextTick中再次取值就不会是undefined了
+* 连续点击下一页，会报错：需要当前歌曲加载完毕之后才允许点击下一页
+onReady变量来控制歌曲的加载 
+* Computed property "disableCls" was assigned to but it has no setter.
+在方法中定义了同样的变量，注意计算属性不能在方法中修改
+
 
 
 
