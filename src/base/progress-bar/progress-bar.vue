@@ -1,8 +1,8 @@
 <template>
-  <div class="progress-bar" ref="progressBar">
+  <div class="progress-bar" ref="progressBar" @click="progressClick">
     <div class="bar-inner">
       <div class="progress" ref="progress"></div>
-      <div class="progress-btn-wrapper"  ref="progressBtn"
+      <div class="progress-btn-wrapper" ref="progressBtn"
            @touchstart.prevent="progressTouchStart"
            @touchmove.prevent="progressTouchMove"
            @touchend="progressTouchEnd"
@@ -42,12 +42,17 @@
         const deltaX = e.touches[0].pageX - this.touch.startX
         const finishedWidth = Math.min(this.$refs.progressBar.clientWidth - progressBtnWidth, Math.max(0, this.touch.left + deltaX))
         this._refreshBarPos(finishedWidth)
-        console.log(deltaX)
         // console.log(finishedWidth)
         // 需要改变percent
       },
       progressTouchEnd() {
         this.touch.initiated = false
+        this._triggerPercent()
+      },
+      progressClick(e) {
+        const rect = this.$refs.progressBar.getBoundingClientRect()
+        const offsetWidth = e.pageX - rect.left
+        this._refreshBarPos(offsetWidth)
         this._triggerPercent()
       },
       _triggerPercent() {

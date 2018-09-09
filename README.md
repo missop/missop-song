@@ -328,6 +328,36 @@ apiRoutes.get('/getDiscList', function (req, res) {
 * 两者比较：
   * 整块组件建议使用v-if
   * 暂时性隐藏则使用v-show
+4.6 改变播放模式
+* 改变播放模式无非就是改变播放列表(playList)和播放完之后的状态
+  * random:乱序播放列表----产生一个随机数，遍历歌曲列表，将随机数索引与当前歌曲交换
+    * 注意要拷贝一份，否则会改变原歌曲列表
+  * loop:播放完成之后直接归0重新播放
+4.7 乱序情况下播放指定歌曲
+4.8 javascript运算符
+* +:可以将后面的转化为数值，同Number()
+  * 例如时间--时间戳：+new Date()
+* |0:取整
+* !!:转化为布尔值
+4.9 歌词获取
+* 由于不能直接访问，所以只能通过后端代理的方式解决，同上
+* axios请求本地后台接口，设置format为json（希望直接拿到json而不是jsonp的callback），
+返回一个promise对象
+* 歌词是歌曲的一部分，所以在Song类中获取歌词,在player中调用之后发现返回结果如下：<br>
+`"MusicJsonCallback({我们想要的东西})"`
+  * 这就需要在服务端进行数据的处理了,先正则匹配到对象然后再对歌词进行base64解码
+* 歌词解析插件(lyricParser)借助scroll组件实现歌词滚动
+  * new Lyric(lyric,callback)
+  * callback({lineNum,txt})
+4.10 cd与歌词切换
+* currentShow:记录当前是cd还是歌词
+* touchStart:记录初始位置
+* touchMove:记录位移值（以下是注意点）
+  * 第一次move时不执行，所以需要一个变量在start中初始化
+  * Y值变化比X大也不执行
+  * 根据currentShow判断歌词距离原位置left值：0||-window.innerWidth
+  * 计算歌词的偏移值:小于0且大于负的一屏的宽度
+  * 相应的transform和opacity的设置
 4.* 错误集合
 * 从歌手页面进入歌曲播放页面报错：Cannot read property 'play' of undefined"
 在nextTick中再次取值就不会是undefined了

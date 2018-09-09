@@ -80,6 +80,9 @@
       },
       random() {
         // 随机播放
+        this.randomPlay({
+          list: this.songs
+        })
       },
       scroll(pos) {
         this.scrollY = pos.y
@@ -91,7 +94,8 @@
         })
       },
       ...mapActions([
-        'selectPlay'
+        'selectPlay',
+        'randomPlay'
       ])
     },
     watch: {
