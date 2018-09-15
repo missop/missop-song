@@ -1,7 +1,8 @@
 <template>
-  <div class="singer">
-    <listview :groupList="singers"
-              @select="toDetail"></listview>
+  <div class="singer" ref="singer">
+    <list-view :groupList="singers"
+               @select="toDetail"
+               ref="list"></list-view>
     <router-view/>
   </div>
 </template>
@@ -10,13 +11,15 @@
   import {getSingerList} from 'api/singer'
   import {ERR_OK} from 'api/config'
   import Singer from 'common/js/singer'
-  import listview from 'base/listview/listview'
+  import ListView from 'base/listview/listview'
   import {mapMutations} from 'vuex'
+  import {playlistMixin} from 'common/js/mixin'
 
   const HOT_NAME = '热门'
   const HOT_ITEM_LEN = 10
 
   export default {
+    mixins: [playlistMixin],
     data() {
       return {
         singers: []
@@ -91,10 +94,15 @@
       toDetail(item) {
         this.setSinger(item)
         this.$router.push(`/singer/${item.id}`)
+      },
+      handlePlayList(playlist) {
+        const bottom = playlist.length > 0 ? '60px' : ''
+        this.$refs.singer.style.bottom = bottom
+        this.$refs.list.refresh()
       }
     },
     components: {
-      listview
+      ListView
     }
   }
 

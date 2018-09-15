@@ -358,6 +358,21 @@ apiRoutes.get('/getDiscList', function (req, res) {
   * 根据currentShow判断歌词距离原位置left值：0||-window.innerWidth
   * 计算歌词的偏移值:小于0且大于负的一屏的宽度
   * 相应的transform和opacity的设置
+* touchend:位移值超过10%时直接移动
+  * 需要在move中计算并记录下来
+4.11 歌曲切换与歌词联动
+* 点击下一首或者上一首歌曲时，歌词没有从头开始
+  * 切换后原歌词对象没有清除掉，导致多个定时器叠加
+* 停止播放歌词不停止滚动
+* 循环播放时点击下一首，歌词还在原来的位置
+  * 歌词重置：this.currentLyric.seek(0)
+* 拖动滑块，歌词也能滚动到对应位置
+4.12 异常情况的优化
+* 如果没有从接口获取到歌词-----清理数据
+* 微信从后台切换到前台时歌词不能播放-----设置延时1000ms而不使用nextTick
+4.13 mini-player占据了高度遮住了scroll的最后一部分内容
+* 定义minxin（其实类似一个Vue组件，继承后覆盖其方法）----playListmixin
+  * 使用mixin 组件中的属性mixins: [playlistMixin]
 4.* 错误集合
 * 从歌手页面进入歌曲播放页面报错：Cannot read property 'play' of undefined"
 在nextTick中再次取值就不会是undefined了
@@ -365,6 +380,7 @@ apiRoutes.get('/getDiscList', function (req, res) {
 onReady变量来控制歌曲的加载 
 * Computed property "disableCls" was assigned to but it has no setter.
 在方法中定义了同样的变量，注意计算属性不能在方法中修改
+* 歌曲页面：Uncaught TypeError: Cannot read property 'scrollToElement' of undefined
 
 
 

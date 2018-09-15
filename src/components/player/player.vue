@@ -42,6 +42,10 @@
           </scroll>
         </div>
         <div class="bottom">
+          <div class="dot-wrapper">
+            <span class="dot" :class="{'active':currentShow==='cd'}"></span>
+            <span class="dot" :class="{'active':currentShow==='lyric'}"></span>
+          </div>
           <div class="progress-wrapper">
             <span class="time time-l">{{format(currentTime)}}</span>
             <div class="progress-bar-wrapper">
@@ -250,16 +254,23 @@
         }
         const time = 300
         this.$refs.lyricList.$el.style[transform] = `translate3d(${offsetWidth}px,0,0)`
-        this.$refs.lyricList.$el.style[transitionDuration] = time
+        this.$refs.lyricList.$el.style[transitionDuration] = `${time}ms`
         this.$refs.middleL.style.opacity = opacity
-        this.$refs.middleL.style[transitionDuration] = time
+        this.$refs.middleL.style[transitionDuration] = `${time}ms`
       },
       getLyric() {
         this.currentSong.getLyric().then((lyric) => {
+          if (this.currentSong.lyric !== lyric) {
+            return
+          }
           this.currentLyric = new Lyric(lyric, this.handleLyric)
           if (this.playing) {
             this.currentLyric.play()
           }
+        }).catch(() => {
+          this.currentLyric = null
+          this.playingLyric = ''
+          this.currentLineNum = 0
         })
       },
       handleLyric({lineNum, txt}) {
@@ -279,7 +290,13 @@
         this.songReady = true
       },
       togglePlaying() {
+        if (!this.songReady) {
+          return
+        }
         this.setPlayingState(!this.playing)
+        if (this.currentLyric) {
+          this.currentLyric.togglePlay()
+        }
       },
       changeMode() {
         const mode = (this.mode + 1) % 3
@@ -301,10 +318,17 @@
       },
       end() {
         if (this.mode === playMode.loop) {
-          this.$refs.audio.currentTime = 0
-          this.$refs.audio.play()
+          this.loop()
         } else {
           this.next()
+        }
+      },
+      loop() {
+        this.refs.audio.currentTime = 0
+        this.$refs.audio.play()
+        this.setPlayingState(true)
+        if (this.currentLyric) {
+          this.currentLyric.seek(0)
         }
       },
       prev() {
@@ -339,11 +363,14 @@
         this.currentTime = e.target.currentTime
       },
       onProgressBarChange(percent) {
+        const currentTime = this.currentSong.duration * percent
+        this.$refs.audio.currentTime = currentTime
         if (!this.playing) {
           this.setPlayingState(true)
         }
-        const currentTime = this.currentSong.duration * percent
-        this.$refs.audio.currentTime = currentTime
+        if (this.currentLyric) {
+          this.currentLyric.seek(currentTime * 1000)
+        }
         // console.log(percent)
       },
       format(interval) {
@@ -386,10 +413,17 @@
         if (oldSong && newSong.id === oldSong.id) {
           return
         }
-        this.$nextTick(() => {
+        if (this.currentLyric) {
+          this.currentLyric.stop()
+          this.currentTime = 0
+          this.playingLyric = ''
+          this.currentLineNum = 0
+        }
+        clearTimeout(this.timer)
+        this.timer = setTimeout(() => {
           this.$refs.audio.play()
           this.getLyric()
-        })
+        }, 1000)
       },
       playing(newPlaying) {
         let audio = this.$refs.audio

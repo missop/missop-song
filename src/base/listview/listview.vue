@@ -81,6 +81,9 @@
       this.listHeight = []
     },
     methods: {
+      refresh() {
+        this.$refs.listview.refresh()
+      },
       onShortcutTouchStart(e) {
         let _index = data(e.target, 'index')
         let firstTouch = e.touches[0]

@@ -61,7 +61,6 @@
         this.$emit('changePercent', finishedWidth / sumWidth)
       },
       _refreshBarPos(finishedWidth) {
-        console.log(finishedWidth)
         this.$refs.progress.style.width = finishedWidth + 'px'
         this.$refs.progressBtn.style[transform] = `translate3d(${finishedWidth}px,0,0)`
       }
