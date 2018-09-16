@@ -377,10 +377,12 @@ apiRoutes.get('/getDiscList', function (req, res) {
 * 从歌手页面进入歌曲播放页面报错：Cannot read property 'play' of undefined"
 在nextTick中再次取值就不会是undefined了
 * 连续点击下一页，会报错：需要当前歌曲加载完毕之后才允许点击下一页
-onReady变量来控制歌曲的加载 
+<br>onReady变量来控制歌曲的加载 
 * Computed property "disableCls" was assigned to but it has no setter.
-在方法中定义了同样的变量，注意计算属性不能在方法中修改
+<br>在方法中定义了同样的变量，注意计算属性不能在方法中修改
 * 歌曲页面：Uncaught TypeError: Cannot read property 'scrollToElement' of undefined
+* TypeError: Cannot read property '_c' of undefined
+<br>router.js里面把component写成了components
 
 
 

@@ -83,7 +83,8 @@
         this.$refs.list.refresh()
       },
       back() {
-        this.$router.push('/singer')
+        // this.$router.push('/singer')
+        this.$router.go(-1)
       },
       random() {
         // 随机播放
