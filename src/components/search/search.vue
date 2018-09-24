@@ -1,11 +1,64 @@
 <template>
   <div class="search">
-i am search
+    <div class="search-box-wrapper">
+      <search-box ref="searchBox" @query="onQueryChange"></search-box>
+    </div>
+    <div class="shortcut-wrapper">
+      <scroll class="shortcut">
+        <div class="hot-key">
+          <h1 class="title">热门搜索</h1>
+          <ul>
+            <li class="item" v-for="item in hotKey" @click="hotQuery(item.k)">
+              <span>{{item.k}}</span>
+            </li>
+          </ul>
+        </div>
+      </scroll>
+    </div>
+    <div class="search-result">
+      <suggest :query="query"></suggest>
+    </div>
   </div>
 </template>
 
 <script type="text/ecmascript-6">
- export default {}
+  import SearchBox from 'base/search-box/search-box'
+  import {getHotKey} from 'api/search'
+  import {ERR_OK} from 'api/config'
+  import Scroll from 'base/scroll/scroll'
+  import Suggest from 'components/suggest/suggest'
+
+  export default {
+    data() {
+      return {
+        hotKey: [],
+        query: ''
+      }
+    },
+    components: {
+      SearchBox,
+      Scroll,
+      Suggest
+    },
+    created() {
+      this._getHotKey()
+    },
+    methods: {
+      _getHotKey() {
+        getHotKey().then((res) => {
+          if (res.code === ERR_OK) {
+            this.hotKey = res.data.hotkey.slice(0, 10)
+          }
+        })
+      },
+      hotQuery(key) {
+        this.$refs.searchBox.setQuery(key)
+      },
+      onQueryChange(query) {
+        this.query = query
+      }
+    }
+  }
 </script>
 
 <style lang="stylus" rel="stylesheet/stylus">

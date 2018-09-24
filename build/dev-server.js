@@ -25,6 +25,18 @@ var app = express()
 
 var apiRoutes = express.Router()
 
+function getObjectData(origin) {
+  var ret = origin
+  if (typeof ret === 'string') {
+    var reg = /^\w+\(({[^()]+})\)$/
+    var matches = ret.match(reg)
+    if (matches) {
+      ret = JSON.parse(matches[1])
+    }
+  }
+  return ret
+}
+
 apiRoutes.get('/getDiscList', function (req, res) {
   var url = 'https://c.y.qq.com/splcloud/fcgi-bin/fcg_get_diss_by_tag.fcg'
   axios.get(url, {
@@ -95,6 +107,22 @@ apiRoutes.get('/getSongList', function (req, res) {
       }
     }
     res.json(ret)
+  }).catch((e) => {
+    console.log(e)
+  })
+})
+apiRoutes.get('/search', function (req, res) {
+  var url = 'https://c.y.qq.com/soso/fcgi-bin/search_for_qq_cp'
+
+  axios.get(url, {
+    headers: {
+      referer: 'https://c.y.qq.com/',
+      host: 'c.y.qq.com'
+    },
+    params: req.query
+  }).then((response) => {
+    var result = getObjectData(response.data)
+    res.json(result)
   }).catch((e) => {
     console.log(e)
   })

@@ -20,6 +20,7 @@
             @scroll="scroll">
       <div class="song-list-wrapper">
         <song-list :songs="songs"
+                   :rank="rank"
                    @selectItem="select"></song-list>
       </div>
       <div class="loading-container" v-show="!songs.length">
@@ -69,6 +70,10 @@
       title: {
         type: String,
         default: ''
+      },
+      rank: {
+        type: Boolean,
+        default: false
       }
     },
     computed: {
