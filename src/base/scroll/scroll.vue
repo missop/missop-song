@@ -24,6 +24,14 @@
       listenScroll: {
         type: Boolean,
         default: false
+      },
+      pullup: {
+        type: Boolean,
+        default: false
+      },
+      pulldown: {
+        type: Boolean,
+        default: false
       }
     },
     mounted() {
@@ -44,6 +52,22 @@
           let me = this
           this.scroll.on('scroll', (pos) => {
             me.$emit('scroll', pos)
+          })
+        }
+        if (this.pullup) {
+          this.scroll.on('scrollEnd', () => {
+            // 当拉到底部超出50像素时触发
+            if (this.scroll.y <= (this.scroll.maxScrollY + 50)) {
+              this.$emit('scrollToEnd')
+            }
+          })
+        }
+        if (this.pulldown) {
+          this.scroll.on('scrollEnd', () => {
+            console.log(this.scroll.y)
+            if (this.scroll.y >= 0) {
+              this.$emit('scrollToTop')
+            }
           })
         }
       },

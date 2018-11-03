@@ -28,7 +28,7 @@ var apiRoutes = express.Router()
 function getObjectData(origin) {
   var ret = origin
   if (typeof ret === 'string') {
-    var reg = /^\w+\(({[^()]+})\)$/
+    var reg = /^callback\((.*)\)$/
     var matches = ret.match(reg)
     if (matches) {
       ret = JSON.parse(matches[1])

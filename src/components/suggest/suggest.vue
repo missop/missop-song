@@ -1,14 +1,21 @@
 <template>
-  <scroll class="suggest">
+  <scroll class="suggest"
+          :data="result"
+          :pullup="true"
+          :pulldown="true"
+          @scrollToEnd="searchMore"
+          @scrollToTop="refresh"
+  >
     <ul class="suggest-list">
-      <li class="suggest-item">
+      <li class="suggest-item" v-for="item in result">
         <div class="icon">
-          <i></i>
+          <i :class="getIconCls(item)"></i>
         </div>
         <div class="name">
-          <p class="text"></p>
+          <p class="text">{{getDisplayName(item)}}</p>
         </div>
       </li>
+      <loading v-show="hasMore" title=""></loading>
     </ul>
     <div class="no-result-wrapper">
     </div>
@@ -17,15 +24,21 @@
 
 <script>
   import Scroll from 'base/scroll/scroll'
+  import Loading from 'base/loading/loading'
   import {search} from 'api/search'
   import {ERR_OK} from 'api/config'
+  import {createSong} from 'common/js/song'
 
   const perpage = 20
+
+  const TYPE_SINGER = 'singer'
 
   export default {
     data() {
       return {
-        page: 1
+        page: 1,
+        hasMore: true,
+        result: []
       }
     },
     props: {
@@ -39,15 +52,75 @@
       }
     },
     components: {
-      Scroll
+      Scroll,
+      Loading
     },
     methods: {
       search() {
+        this.page = 1
+        this.hasMore = true
         search(this.query, this.page, this.showSinger, perpage).then((res) => {
           if (res.code === ERR_OK) {
-            console.log(res)
+            this.result = this._genResult(res.data)
+            this._checkMore(res.data)
           }
         })
+      },
+      // 上拉加载更多内容
+      searchMore() {
+        if (!this.hasMore) {
+          return
+        }
+        this.page++
+        search(this.query, this.page, this.showSinger, perpage).then((res) => {
+          if (res.code === ERR_OK) {
+            this.result = this.result.concat(this._genResult(res.data))
+            this._checkMore(res.data)
+          }
+        })
+      },
+      // 下拉刷新
+      refresh() {
+        // this.search()
+      },
+      getDisplayName(item) {
+        if (item.type === TYPE_SINGER) {
+          return item.singername
+        } else {
+          return `${item.name}-${item.singer}`
+        }
+      },
+      getIconCls(item) {
+        if (item.type === TYPE_SINGER) {
+          return 'icon-mine'
+        } else {
+          return 'icon-music'
+        }
+      },
+      _checkMore(data) {
+        const song = data.song
+        if (!song.list.length || perpage * this.page >= song.totalnum) {
+          this.hasMore = false
+        }
+      },
+      _genResult(data) {
+        let ret = []
+        if (data.zhida && data.zhida.singerid) {
+          ret.push({...data.zhida, ...{type: TYPE_SINGER}})
+        }
+        if (data.song) {
+          ret = ret.concat(this._normalizeSongs(data.song.list))
+        }
+        return ret
+      },
+      _normalizeSongs(songs) {
+        let ret = []
+        songs.forEach((musicData) => {
+          if (musicData.songid && musicData.albumid) {
+            ret.push(createSong(musicData))
+          }
+        })
+        return ret
       }
     },
     watch: {

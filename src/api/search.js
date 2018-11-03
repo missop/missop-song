@@ -38,6 +38,6 @@ export function search(query, page, zhida, perpage) {
   return axios.get(url, {
     params: data
   }).then((res) => {
-    Promise.resolve(res.data)
+    return Promise.resolve(res.data)
   })
 }
