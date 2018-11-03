@@ -64,7 +64,6 @@
         }
         if (this.pulldown) {
           this.scroll.on('scrollEnd', () => {
-            console.log(this.scroll.y)
             if (this.scroll.y >= 0) {
               this.$emit('scrollToTop')
             }

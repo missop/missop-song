@@ -7,7 +7,7 @@
           @scrollToTop="refresh"
   >
     <ul class="suggest-list">
-      <li class="suggest-item" v-for="item in result">
+      <li class="suggest-item" v-for="item in result" @click="selectItem(item)">
         <div class="icon">
           <i :class="getIconCls(item)"></i>
         </div>
@@ -17,7 +17,8 @@
       </li>
       <loading v-show="hasMore" title=""></loading>
     </ul>
-    <div class="no-result-wrapper">
+    <div class="no-result-wrapper" v-show="!result.length">
+      <no-result title="抱歉，没有找到您想要的结果"></no-result>
     </div>
   </scroll>
 </template>
@@ -25,9 +26,12 @@
 <script>
   import Scroll from 'base/scroll/scroll'
   import Loading from 'base/loading/loading'
+  import NoResult from 'base/no-result/no-result'
   import {search} from 'api/search'
   import {ERR_OK} from 'api/config'
   import {createSong} from 'common/js/song'
+  import Singer from 'common/js/singer'
+  import {mapMutations, mapActions} from 'vuex'
 
   const perpage = 20
 
@@ -53,7 +57,8 @@
     },
     components: {
       Scroll,
-      Loading
+      Loading,
+      NoResult
     },
     methods: {
       search() {
@@ -103,6 +108,21 @@
           this.hasMore = false
         }
       },
+      // 点击之后跳转
+      selectItem(item) {
+        if (item.type === TYPE_SINGER) {
+          const singer = new Singer({
+            id: item.singermid,
+            name: item.singername
+          })
+          this.$router.push({
+            path: `/search/${singer.id}`
+          })
+          this.setSinger(singer)
+        } else {
+          this.insertSong(item)
+        }
+      },
       _genResult(data) {
         let ret = []
         if (data.zhida && data.zhida.singerid) {
@@ -121,7 +141,13 @@
           }
         })
         return ret
-      }
+      },
+      ...mapMutations({
+        setSinger: 'SET_SINGER'
+      }),
+      ...mapActions([
+        'insertSong'
+      ])
     },
     watch: {
       query() {
