@@ -122,7 +122,7 @@
         } else {
           this.insertSong(item)
         }
-        this.$emit('select', item)
+        this.$emit('select', item.name)
       },
       _genResult(data) {
         let ret = []
