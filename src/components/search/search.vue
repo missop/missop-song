@@ -16,7 +16,7 @@
       </scroll>
     </div>
     <div class="search-result" v-show="query">
-      <suggest :query="query"></suggest>
+      <suggest :query="query" @select="saveSearch"></suggest>
     </div>
   </div>
 </template>
@@ -27,6 +27,7 @@
   import {ERR_OK} from 'api/config'
   import Scroll from 'base/scroll/scroll'
   import Suggest from 'components/suggest/suggest'
+  import {mapActions} from 'vuex'
 
   export default {
     data() {
@@ -56,7 +57,11 @@
       },
       onQueryChange(query) {
         this.query = query
-      }
+      },
+      saveSearch(item) {
+        this.saveSearchHistory(item)
+      },
+      ...mapActions(['saveSearchHistory'])
     }
   }
 </script>

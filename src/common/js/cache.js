@@ -1,94 +1,37 @@
 import storage from 'good-storage'
 
+// 取值和存值的一个标记
 const SEARCH_KEY = '__search__'
 const SEARCH_MAX_LEN = 15
 
-const PLAY_KEY = '__play__'
-const PLAY_MAX_LEN = 200
-
-const FAVORITE_KEY = '__favorite__'
-const FAVORITE_MAX_LEN = 200
-
 function insertArray(arr, val, compare, maxLen) {
   const index = arr.findIndex(compare)
+  // 如果是第一次执行的话
   if (index === 0) {
     return
-  }
-  if (index > 0) {
+  } else if (index > 0) {
     arr.splice(index, 1)
   }
+  // 最后把值添加到数组最前面
   arr.unshift(val)
+  // 判断是否超出最大长度
   if (maxLen && arr.length > maxLen) {
+    // 从最后面删除一条记录
     arr.pop()
-  }
-}
-
-function deleteFromArray(arr, compare) {
-  const index = arr.findIndex(compare)
-  if (index > -1) {
-    arr.splice(index, 1)
   }
 }
 
 export function saveSearch(query) {
   let searches = storage.get(SEARCH_KEY, [])
   insertArray(searches, query, (item) => {
-    return item === query
+    return item.id === query.id
   }, SEARCH_MAX_LEN)
+  // 设置localstorage
   storage.set(SEARCH_KEY, searches)
   return searches
 }
 
-export function deleteSearch(query) {
-  let searches = storage.get(SEARCH_KEY, [])
-  deleteFromArray(searches, (item) => {
-    return item === query
-  })
-  storage.set(SEARCH_KEY, searches)
-  return searches
-}
-
-export function clearSearch() {
-  storage.remove(SEARCH_KEY)
-  return []
-}
-
+// 获取存储的初始值
 export function loadSearch() {
   return storage.get(SEARCH_KEY, [])
 }
-
-export function savePlay(song) {
-  let songs = storage.get(PLAY_KEY, [])
-  insertArray(songs, song, (item) => {
-    return song.id === item.id
-  }, PLAY_MAX_LEN)
-  storage.set(PLAY_KEY, songs)
-  return songs
-}
-
-export function loadPlay() {
-  return storage.get(PLAY_KEY, [])
-}
-
-export function saveFavorite(song) {
-  let songs = storage.get(FAVORITE_KEY, [])
-  insertArray(songs, song, (item) => {
-    return song.id === item.id
-  }, FAVORITE_MAX_LEN)
-  storage.set(FAVORITE_KEY, songs)
-  return songs
-}
-
-export function deleteFavorite(song) {
-  let songs = storage.get(FAVORITE_KEY, [])
-  deleteFromArray(songs, (item) => {
-    return item.id === song.id
-  })
-  storage.set(FAVORITE_KEY, songs)
-  return songs
-}
-
-export function loadFavorite() {
-  return storage.get(FAVORITE_KEY, [])
-}
-
