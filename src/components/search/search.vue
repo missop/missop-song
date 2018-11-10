@@ -3,8 +3,8 @@
     <div class="search-box-wrapper">
       <search-box ref="searchBox" @query="onQueryChange"></search-box>
     </div>
-    <div class="shortcut-wrapper" v-show="!query">
-      <scroll class="shortcut">
+    <div class="shortcut-wrapper" v-show="!query" ref="shortcutWrapper">
+      <scroll class="shortcut" :data="shortcut" ref="shortcut">
         <div>
           <div class="hot-key">
             <h1 class="title">热门搜索</h1>
@@ -26,8 +26,8 @@
         </div>
       </scroll>
     </div>
-    <div class="search-result" v-show="query">
-      <suggest :query="query" @select="saveSearch"></suggest>
+    <div class="search-result" ref="searchResult" v-show="query">
+      <suggest :query="query" @select="saveSearch" ref="suggest"></suggest>
     </div>
     <confirm ref="confirm" @confirm="clearSearchHistory" text="是否清空所有搜索历史" confirmBtnText="清空"></confirm>
   </div>
@@ -42,8 +42,10 @@
   import Scroll from 'base/scroll/scroll'
   import Suggest from 'components/suggest/suggest'
   import {mapGetters, mapActions} from 'vuex'
+  import {playlistMixin} from 'common/js/mixin'
 
   export default {
+    mixins: [playlistMixin],
     data() {
       return {
         hotKey: [],
@@ -58,12 +60,33 @@
       Confirm
     },
     computed: {
+      shortcut() {
+        return this.hotKey.concat(this.searchHistory)
+      },
       ...mapGetters(['searchHistory'])
     },
     created() {
       this._getHotKey()
     },
+    watch: {
+      query(newQuery) {
+        if (!newQuery) {
+          setTimeout(() => {
+            this.$refs.shortcut.refresh()
+          }, 20)
+        }
+      }
+    },
     methods: {
+      handlePlayList(playList) {
+        const bottom = playList.length > 0 ? '60px' : ''
+
+        this.$refs.shortcutWrapper.style.bottom = bottom
+        this.$refs.shortcut.refresh()
+
+        this.$refs.searchResult.style.bottom = bottom
+        this.$refs.suggest.update()
+      },
       _getHotKey() {
         getHotKey().then((res) => {
           if (res.code === ERR_OK) {

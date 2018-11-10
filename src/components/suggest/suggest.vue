@@ -5,6 +5,7 @@
           :pulldown="true"
           @scrollToEnd="searchMore"
           @scrollToTop="refresh"
+          ref="suggest"
   >
     <ul class="suggest-list">
       <li class="suggest-item" v-for="item in result" @click="selectItem(item)">
@@ -61,6 +62,9 @@
       NoResult
     },
     methods: {
+      update() {
+        this.$refs.suggest.refresh()
+      },
       search() {
         this.page = 1
         this.hasMore = true
@@ -122,7 +126,7 @@
         } else {
           this.insertSong(item)
         }
-        this.$emit('select', item.name)
+        this.$emit('select', item)
       },
       _genResult(data) {
         let ret = []
